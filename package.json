@@ -1,0 +1,34 @@
+{
+  "name": "@genoacms/adapter-minio",
+  "version": "0.8.3",
+  "description": "GenoaCMS storage adapter for minio",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest --silent=false --config node_modules/@genoacms/cloudabstraction/test/vitest.config.js --run node_modules/@genoacms/cloudabstraction/test/storage.test.js"
+  },
+  "author": {
+    "name": "Filip Holčík",
+    "email": "filip.holcik.official@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GenoaCMS/adapter-minio.git"
+  },
+  "homepage": "https://github.com/GenoaCMS/adapter-minio#readme",
+  "license": "ISC",
+  "dependencies": {
+    "@genoacms/cloudabstraction": "^0.8.3",
+    "minio": "^8.0.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.22.0",
+    "neostandard": "^0.12.1",
+    "vitest": "^3.0.9"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.js"
+    }
+  }
+}
