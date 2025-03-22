@@ -23,6 +23,7 @@ const config = {
         adapter: import('../src/index.js'),
         config: {
           endPoint: 'localhost',
+          useSSL: false,
           port: 9000,
           accessKey: credentials.accessKey,
           secretKey: credentials.secretKey
