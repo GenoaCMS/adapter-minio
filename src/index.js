@@ -63,9 +63,18 @@ const moveObject = async ({ bucket, name }, newName) => {
   await minioClient.removeObject(bucket, name)
 }
 
+/**
+ * @type {Adapter['deleteObject']}
+ */
+const deleteObject = async ({ bucket, name }) => {
+  checkBucket(bucket)
+  await minioClient.removeObject(bucket, name)
+}
+
 export {
   getObject,
   getSignedURL,
   uploadObject,
-  moveObject
+  moveObject,
+  deleteObject
 }
