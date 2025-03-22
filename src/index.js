@@ -7,6 +7,7 @@ import { resolve } from 'node:path/posix'
  * @import {Adapter} from '@genoacms/cloudabstraction/storage'
  */
 const ADAPTER_PATH = '@genoacms/adapter-minio'
+const DIRECTORY_PLACEHOLDER = '.directoryPlaceholder'
 
 const provider = getProvider('storage', ADAPTER_PATH)
 const minioClient = new Minio.Client(provider.config)
@@ -92,9 +93,12 @@ function parseDirectory (bucket, stream) {
     }
     stream.on('data', function (obj) {
       if (obj.hasOwnProperty('name')) {
+        if (obj.name.endsWith(DIRECTORY_PLACEHOLDER)) return
         const file = {
           bucket,
-          name: obj.name
+          name: obj.name,
+          size: obj.size,
+          lastModified: obj.lastModified
         }
         contents.files.push(file)
       } else {
@@ -114,9 +118,17 @@ function parseDirectory (bucket, stream) {
     })
   })
 }
+/**
+ * @type {Adapter['createDirectory']}
+ */
+const createDirectory = async ({ bucket, name }) => {
+  checkBucket(bucket)
+  await minioClient.putObject(bucket, join(name, DIRECTORY_PLACEHOLDER), '')
+}
 
-// await listDirectory({ bucket: 'genoacms', name: 'tettt/' })
+// console.log(await listDirectory({ bucket: 'genoacms', name: 'tettt/' }))
 // getObject({ bucket: 'genoacms', name: 'tettt/20250308_112255.jpg' })
+// createDirectory({ bucket: 'genoacms', name: 'ant' })
 
 export {
   getObject,
@@ -124,5 +136,6 @@ export {
   uploadObject,
   moveObject,
   deleteObject,
-  listDirectory
+  listDirectory,
+  createDirectory
 }
