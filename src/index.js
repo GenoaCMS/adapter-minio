@@ -45,8 +45,15 @@ const getSignedURL = async ({ bucket, name }, expires) => {
   const url = await minioClient.presignedGetObject(bucket, name, expires)
   return url
 }
-
+/**
+ * @type {Adapter['uploadObject']}
+ */
+const uploadObject = async ({ bucket, name }, stream, options = {}) => {
+  checkBucket(bucket)
+  await minioClient.putObject(bucket, name, stream)
+}
 export {
   getObject,
-  getSignedURL
+  getSignedURL,
+  uploadObject
 }
