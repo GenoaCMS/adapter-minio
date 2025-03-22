@@ -1,7 +1,6 @@
 import { config, getProvider } from '@genoacms/cloudabstraction'
 import * as Minio from 'minio'
 import { join } from 'node:path'
-import { resolve } from 'node:path/posix'
 
 /**
  * @import {Adapter} from '@genoacms/cloudabstraction/storage'
@@ -118,6 +117,7 @@ function parseDirectory (bucket, stream) {
     })
   })
 }
+
 /**
  * @type {Adapter['createDirectory']}
  */
@@ -126,9 +126,33 @@ const createDirectory = async ({ bucket, name }) => {
   await minioClient.putObject(bucket, join(name, DIRECTORY_PLACEHOLDER), '')
 }
 
+/**
+ * @type {Adapter['deleteDirectory']}
+ */
+const deleteDirectory = async ({ bucket, name }) => {
+  checkBucket(bucket)
+
+  const objectsStream = minioClient.listObjects(bucket, name, true)
+  const objects = []
+
+  objectsStream.on('data', function (obj) {
+    objects.push(obj.name)
+  })
+
+  objectsStream.on('error', function (e) {
+    console.error(e)
+    throw new Error(`Failed to delete directory ${name}`)
+  })
+
+  objectsStream.on('end', async () => {
+    await minioClient.removeObjects(bucket, objects)
+  })
+}
+
 // console.log(await listDirectory({ bucket: 'genoacms', name: 'tettt/' }))
 // getObject({ bucket: 'genoacms', name: 'tettt/20250308_112255.jpg' })
 // createDirectory({ bucket: 'genoacms', name: 'ant' })
+// deleteDirectory({ bucket: 'genoacms', name: 'ant' })
 
 export {
   getObject,
@@ -137,5 +161,6 @@ export {
   moveObject,
   deleteObject,
   listDirectory,
-  createDirectory
+  createDirectory,
+  deleteDirectory
 }
