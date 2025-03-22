@@ -1,6 +1,9 @@
 import { config, getProvider } from '@genoacms/cloudabstraction'
 import * as Minio from 'minio'
 
+/**
+ * @import {Adapter} from '@genoacms/cloudabstraction/storage'
+ */
 const ADAPTER_PATH = '@genoacms/adapter-minio'
 
 const provider = getProvider('storage', ADAPTER_PATH)
@@ -23,14 +26,27 @@ const checkBucket = async (name) => {
   }
 }
 
+/**
+ * @type {Adapter['getObject']}
+ */
 const getObject = async ({ bucket, name }) => {
-  checkBucket()
+  checkBucket(bucket)
   const data = await minioClient.getObject(bucket, name)
   return {
     data
   }
 }
 
+/**
+ * @type {Adapter['getSignedURL']}
+ */
+const getSignedURL = async ({ bucket, name }, expires) => {
+  checkBucket(bucket)
+  const url = await minioClient.presignedGetObject(bucket, name, expires)
+  return url
+}
+
 export {
-  getObject
+  getObject,
+  getSignedURL
 }
