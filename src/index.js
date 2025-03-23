@@ -149,10 +149,51 @@ const deleteDirectory = async ({ bucket, name }) => {
   })
 }
 
+/**
+ * @type {Adapter['moveDirectory']}
+ */
+const moveDirectory = async ({ bucket, name }, newName) => {
+  checkBucket(bucket)
+  const objects = await getMoveObjects({ bucket, name })
+  const newObjects = objects.map(o => o.replace(name, newName))
+  await moveObjects(bucket, objects, newObjects)
+  await minioClient.removeObjects(bucket, objects)
+}
+
+async function getMoveObjects ({ bucket, name }) {
+  return new Promise((resolve, reject) => {
+    const objectsStream = minioClient.listObjects(bucket, name, true)
+    const objects = []
+
+    objectsStream.on('data', function (obj) {
+      objects.push(obj.name)
+    })
+
+    objectsStream.on('error', function (e) {
+      console.error(e)
+      reject(new Error(`Failed to delete directory ${name}`))
+    })
+
+    objectsStream.on('end', async () => {
+      resolve(objects)
+    })
+  })
+}
+
+async function moveObjects (bucket, sources, dests) {
+  const copyOperations = []
+  for (let i = 0; i < sources.length; i++) {
+    const operation = minioClient.copyObject(bucket, dests[i], `/${bucket}/${sources[i]}`)
+    copyOperations.push(operation)
+  }
+  await Promise.all(copyOperations)
+}
+
 // console.log(await listDirectory({ bucket: 'genoacms', name: 'tettt/' }))
 // getObject({ bucket: 'genoacms', name: 'tettt/20250308_112255.jpg' })
 // createDirectory({ bucket: 'genoacms', name: 'ant' })
 // deleteDirectory({ bucket: 'genoacms', name: 'ant' })
+// moveDirectory({ bucket: 'genoacms', name: 'ant' }, 'newant')
 
 export {
   getObject,
@@ -162,5 +203,6 @@ export {
   deleteObject,
   listDirectory,
   createDirectory,
-  deleteDirectory
+  deleteDirectory,
+  moveDirectory
 }
