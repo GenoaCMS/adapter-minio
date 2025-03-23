@@ -94,7 +94,6 @@ function parseDirectory (bucket, stream) {
       if (obj.hasOwnProperty('name')) {
         if (obj.name.endsWith(DIRECTORY_PLACEHOLDER)) return
         const file = {
-          bucket,
           name: obj.name,
           size: obj.size,
           lastModified: obj.lastModified
@@ -188,12 +187,6 @@ async function moveObjects (bucket, sources, dests) {
   }
   await Promise.all(copyOperations)
 }
-
-// console.log(await listDirectory({ bucket: 'genoacms', name: 'tettt/' }))
-// getObject({ bucket: 'genoacms', name: 'tettt/20250308_112255.jpg' })
-// createDirectory({ bucket: 'genoacms', name: 'ant' })
-// deleteDirectory({ bucket: 'genoacms', name: 'ant' })
-// moveDirectory({ bucket: 'genoacms', name: 'ant' }, 'newant')
 
 export {
   getObject,
