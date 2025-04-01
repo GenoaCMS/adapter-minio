@@ -10,7 +10,6 @@ const DIRECTORY_PLACEHOLDER = '.directoryPlaceholder'
 
 const provider = getProvider('storage', ADAPTER_PATH)
 const minioClient = new Minio.Client(provider.config)
-console.log(provider)
 
 const isBucketRegistered = (name) => {
   const has = config.storage.buckets.find((bucket) => bucket.name === name &&
@@ -44,7 +43,8 @@ const getObject = async ({ bucket, name }) => {
  */
 const getSignedURL = async ({ bucket, name }, expires) => {
   checkBucket(bucket)
-  const url = await minioClient.presignedGetObject(bucket, name, expires)
+  const expiresIn = (expires.getTime() - Date.now()) / 1_000
+  const url = await minioClient.presignedGetObject(bucket, name, expiresIn)
   return url
 }
 
@@ -77,7 +77,7 @@ const deleteObject = async ({ bucket, name }) => {
  */
 const listDirectory = async ({ bucket, name }, listingParams = {}) => {
   checkBucket(bucket)
-  const prefix = join(name, '/')
+  const prefix = !name ? '' : join(name, '/')
   const startAfter = listingParams.startAfter
   const stream = minioClient.listObjectsV2(bucket, prefix, false, startAfter)
   const contents = await parseDirectory(bucket, stream)

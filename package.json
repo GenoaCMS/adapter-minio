@@ -1,6 +1,6 @@
 {
   "name": "@genoacms/adapter-minio",
-  "version": "0.8.3",
+  "version": "0.8.10",
   "description": "GenoaCMS storage adapter for minio",
   "type": "module",
   "main": "src/index.js",
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/GenoaCMS/adapter-minio#readme",
   "license": "ISC",
   "dependencies": {
-    "@genoacms/cloudabstraction": "^0.8.3",
+    "@genoacms/cloudabstraction": "0.8.10",
     "minio": "^8.0.5"
   },
   "devDependencies": {
